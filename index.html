@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#173d35">
+<title>病生理90+复习打卡</title>
+<style>
+:root{--bg:#f3f6f4;--card:#fff;--ink:#18312b;--muted:#6c7d76;--line:#e1e9e4;--green:#176b50;--pale:#e8f3ed;--gold:#a66a16}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans CJK SC",sans-serif;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}
+header{background:linear-gradient(135deg,#173d35,#26775b);color:#fff;margin:0 -14px 16px;padding:24px 18px 20px;border-radius:0 0 22px 22px}
+h1{font-size:22px;margin:0 0 6px}header p{margin:0;color:#d7e9e1;font-size:13px;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}.stat{background:#ffffff18;border:1px solid #ffffff25;border-radius:12px;padding:10px 8px}.stat b{display:block;font-size:21px}.stat span{font-size:11px;color:#d7e9e1}
+main{max-width:680px;margin:auto}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:0 3px 12px #153d3010}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.muted{color:var(--muted);font-size:12px}.date-nav{display:grid;grid-template-columns:44px 1fr 44px;gap:8px;align-items:center;margin:12px 0}
+button,input{font:inherit}button{border:0;border-radius:11px;padding:11px 13px;background:var(--green);color:white;font-weight:600;cursor:pointer}button.secondary{background:var(--pale);color:var(--green)}button.ghost{background:#f3f6f4;color:var(--ink)}button:disabled{opacity:.35}
+input[type=date]{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+h2{font-size:16px;margin:0 0 10px}.phase{display:inline-block;background:var(--pale);color:var(--green);font-size:11px;font-weight:700;padding:5px 8px;border-radius:20px;margin-bottom:8px}
+.task{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.4}.task input{width:20px;height:20px;accent-color:var(--green);flex:0 0 auto;margin:0}
+.progress{height:9px;border-radius:20px;background:#e8eee9;overflow:hidden}.progress>i{display:block;height:100%;background:#23835f;width:0}
+.weekgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.day{min-height:43px;padding:5px 1px;border-radius:9px;background:#f4f7f5;color:var(--ink);font-size:11px}.day.active{outline:2px solid var(--green);background:var(--pale)}.day.done{background:#d9eee2;color:#15583e}.day small{display:block;font-size:9px;color:var(--muted);margin-top:2px}
+.tools{display:flex;flex-wrap:wrap;gap:8px}.tools button{font-size:12px;padding:10px}
+.note{font-size:12px;color:var(--muted);line-height:1.6}.pill{font-size:11px;color:var(--gold);background:#fff3df;padding:5px 8px;border-radius:20px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:10px 0 24px}
+</style>
+</head>
+<body>
+<header>
+<h1>病生理 90+ 复习打卡</h1>
+<p>2026.11.13 — 12.31｜按讲义页码推进｜每日打卡自动保存</p>
+<div class="stats">
+ <div class="stat"><b id="doneCount">0</b><span>已完成学习日</span></div>
+ <div class="stat"><b id="totalCount">32</b><span>第一轮学习日</span></div>
+ <div class="stat"><b id="rate">0%</b><span>第一轮完成率</span></div>
+</div>
+</header>
+<main>
+<section class="card">
+ <div class="row"><h2>选择复习日期</h2><span class="muted">点日期切换任务</span></div>
+ <div class="date-nav">
+  <button class="secondary" id="prev">‹</button>
+  <input type="date" id="date" min="2026-11-13" max="2026-12-31" value="2026-11-13">
+  <button class="secondary" id="next">›</button>
+ </div>
+ <div class="weekgrid" id="week"></div>
+</section>
+<section class="card">
+ <div class="row"><div><span class="phase" id="phase">第一轮学习</span><h2 id="taskTitle">绪论：疾病概论</h2></div><span class="pill" id="pageLabel">第1—8页</span></div>
+ <p class="muted" id="taskDesc">完成当天计划，并勾选下方任务。</p>
+ <div class="progress"><i id="dayProgress"></i></div>
+ <p class="muted" id="dayPercent">今日完成 0/6 项</p>
+ <div id="checks"></div>
+</section>
+<section class="card">
+ <h2>复习阶段总览</h2>
+ <div class="row"><span class="muted">第一轮：11月13日—12月19日</span><b id="firstPct">0%</b></div>
+ <div class="progress" style="margin:8px 0 14px"><i id="firstBar"></i></div>
+ <div class="row"><span class="muted">刷题周：12月21日—12月27日</span><b id="quizPct">0/7</b></div>
+ <div class="progress" style="margin:8px 0 14px"><i id="quizBar"></i></div>
+ <p class="note">12月20日为机动补漏日；12月28—31日为考试窗口。若考试提前到12月28日，刷题周正好为12月21—27日。</p>
+</section>
+<section class="card">
+ <h2>数据备份与恢复</h2>
+ <p class="note">打卡记录保存在当前浏览器的本地存储中。清理浏览器数据、换手机或换浏览器前，请先导出备份。</p>
+ <div class="tools">
+  <button id="export">导出打卡备份</button>
+  <button class="secondary" id="importBtn">导入备份</button>
+  <input type="file" id="file" accept="application/json" hidden>
+  <button class="ghost" id="reset">清空全部记录</button>
+ </div>
+ <p class="note" id="status" aria-live="polite"></p>
+</section>
+<footer>学习计划依据你上传的病生理复习讲义整理。建议每日 90—120 分钟，重在主动回忆和错题复盘。</footer>
+</main>
+<script>
+const plan={
+"2026-11-13":["第一轮学习","绪论：疾病概论","第1—8页","疾病概论、病因学、发病学、疾病转归"],
+"2026-11-14":["第一轮学习","体液组成与水钠平衡","第9—16页","体液组成、水钠平衡调节、高渗性脱水"],
+"2026-11-16":["第一轮学习","脱水与水中毒","第17—24页","低渗性脱水、等渗性脱水、水中毒、脱水比较"],
+"2026-11-17":["第一轮学习","水肿与低钾血症","第25—32页","水肿发生机制、低钾血症的原因及代偿"],
+"2026-11-18":["第一轮学习","钾代谢紊乱","第33—40页","低钾血症影响、高钾血症发生机制及影响"],
+"2026-11-19":["第一轮学习","酸碱平衡基础","第1—7页","酸碱平衡概念、四大调节、血气指标基础"],
+"2026-11-20":["第一轮学习","酸碱指标与代谢性酸中毒","第8—14页","AB、SB、BB、BE、AG、代酸机制及代偿"],
+"2026-11-21":["第一轮学习","酸碱紊乱类型","第15—20页","代酸影响、呼酸、代碱"],
+"2026-11-23":["第一轮学习","呼碱与混合型紊乱","第21—26页","呼碱、混合型酸碱紊乱、病例分析"],
+"2026-11-24":["第一轮学习","缺氧基础","第1—7页","缺氧概念、血氧指标、低张性缺氧"],
+"2026-11-25":["第一轮学习","四种缺氧及其影响","第8—15页","血液性、循环性、组织性缺氧，缺氧对机体影响"],
+"2026-11-26":["第一轮学习","发热概念及机制","第16—23页","发热概念、发热激活物、内生致热原"],
+"2026-11-27":["第一轮学习","发热时相与机体变化","第24—31页","发热机制、时相、机体变化、防治"],
+"2026-11-28":["第一轮学习","应激基础","第32—38页","应激概念、应激原、全身适应综合征"],
+"2026-11-30":["第一轮学习","应激反应","第39—45页","应激反应的基本表现、应激与疾病"],
+"2026-12-01":["第一轮学习","休克基础及机制","第46—51页","休克概念、病因、发病机制"],
+"2026-12-02":["第一轮学习","休克微循环变化","第52—57页","休克微循环变化及其分期"],
+"2026-12-03":["第一轮学习","休克器官变化及防治","第58—62页","休克细胞代谢变化、器官功能变化、防治"],
+"2026-12-04":["第一轮学习","凝血与抗凝血","第1—7页","凝血与抗凝血平衡、凝血因子及血小板异常"],
+"2026-12-05":["第一轮学习","DIC机制与检查","第8—15页","DIC发生机制、分期、实验室检查"],
+"2026-12-07":["第一轮学习","DIC后续与再灌注损伤","第16—23页","DIC功能代谢变化、防治；再灌注损伤概念及自由基"],
+"2026-12-08":["第一轮学习","钙超载与白细胞激活","第24—30页","钙超载、白细胞激活、器官损伤及防治"],
+"2026-12-09":["第一轮学习","呼吸衰竭基础","第1—8页","呼吸衰竭概念、通气功能障碍"],
+"2026-12-10":["第一轮学习","换气障碍与呼衰影响","第9—16页","换气障碍、通气血流比例失调、呼吸衰竭影响"],
+"2026-12-11":["第一轮学习","心衰基础与左心衰","第17—21页","心功能不全概念、病因及诱因、左心衰"],
+"2026-12-12":["第一轮学习","右心衰与心脏代偿","第22—26页","右心衰、全心衰、心脏代偿"],
+"2026-12-14":["第一轮学习","心衰发病机制","第27—32页","心脏重构、心力衰竭发病机制"],
+"2026-12-15":["第一轮学习","肝功能不全","第1—8页","肝脏生理、代谢及胆汁排泄障碍"],
+"2026-12-16":["第一轮学习","肝性脑病","第9—17页","氨中毒、假性神经递质等机制"],
+"2026-12-17":["第一轮学习","肾功能不全与急性肾衰","第18—25页","肾功能不全、急性肾衰发生机制"],
+"2026-12-18":["第一轮学习","急性肾衰与慢性肾衰","第26—32页","急性肾衰临床表现、少尿期、慢性肾衰发展"],
+"2026-12-19":["第一轮学习","慢性肾衰与尿毒症","第33—39页","慢性肾衰机制、临床表现、尿毒症"]
+};
+const restText={
+"2026-11-15":"休息日：可选20分钟回忆前两天内容。",
+"2026-11-22":"休息日：可选轻度回忆酸碱指标和代偿。",
+"2026-11-29":"休息日：可选回忆缺氧与发热的机制。",
+"2026-12-06":"休息日：可选回忆DIC发生机制。",
+"2026-12-13":"休息日：可选比较左心衰和右心衰。",
+"2026-12-20":"机动补漏日：整理第一轮遗留问题，尽量休息。"
+};
+const quiz={
+"2026-12-21":["刷题周","全章节基础题","第1天","全章节基础选择题，检查知识漏洞"],
+"2026-12-22":["刷题周","水钠钾、酸碱、缺氧专项","第2天","专项练习并整理指标、机制错误"],
+"2026-12-23":["刷题周","发热、应激、休克、DIC专项","第3天","专项练习并复盘易混淆机制"],
+"2026-12-24":["刷题周","呼衰、心衰、肝衰、肾衰专项","第4天","专项练习并整理错题"],
+"2026-12-25":["刷题周","第一套完整模拟试卷","第5天","严格限时完成并估算得分"],
+"2026-12-26":["刷题周","错题复盘与薄弱章节回顾","第6天","逐题分析错误原因，回归讲义"],
+"2026-12-27":["刷题周","第二套模拟试卷","第7天","检验最终水平，整理考前重点"]
+};
+const labels=["当天计划内容已经看完","重要概念和定义已经理解","核心发病机制可以独立复述","重点指标和数据能够回忆","完成当天闭卷检测","复习了之前学过的内容"];
+const KEY="bingli90plus_v1";
+let data={};try{data=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){data={}}
+let selected="2026-11-13";
+const $=id=>document.getElementById(id);
+const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+const fmt=d=>{const [y,m,day]=d.split("-");return `${y}年${Number(m)}月${Number(day)}日`};
+const add=(d,n)=>{let x=new Date(d+"T12:00:00");x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)};
+function getInfo(d){return plan[d]||quiz[d]||null}
+function getChecks(d){return data[d]||[]}
+function setCheck(d,i,v){let a=getChecks(d).slice();a[i]=v;data[d]=a;save();render()}
+function render(){
+ $("date").value=selected;
+ const info=getInfo(selected), isRest=!!restText[selected];
+ let phase,title,pages,desc;
+ if(info){[phase,title,pages,desc]=info}
+ else if(isRest){phase="休息 / 机动";title=selected==="2026-12-20"?"第一轮机动补漏":"休息与轻度回忆";pages="无新页码";desc=restText[selected]}
+ else if(selected<"2026-11-13"){phase="计划外";title="请选择计划日期";pages="—";desc=""}
+ else if(selected>"2026-12-27"){phase="考试窗口";title="考前 / 考试日";pages="12月28日—31日";desc="保持状态，回顾错题和重点机制，不建议临时大量学习。"}
+ else {phase="休息 / 补漏";title="机动复习";pages="—";desc="回顾错题或补齐落下的内容。"}
+ $("phase").textContent=phase;$("taskTitle").textContent=title;$("pageLabel").textContent=pages;$("taskDesc").textContent=desc;
+ const arr=getChecks(selected);
+ $("checks").innerHTML=labels.map((t,i)=>`<label class="task"><input type="checkbox" data-i="${i}" ${arr[i]?"checked":""}><span>${t}</span></label>`).join("");
+ $("checks").querySelectorAll("input").forEach(el=>el.addEventListener("change",e=>setCheck(selected,Number(e.target.dataset.i),e.target.checked)));
+ const c=labels.filter((_,i)=>arr[i]).length;
+ $("dayProgress").style.width=(c/6*100)+"%";$("dayPercent").textContent=`今日完成 ${c}/6 项`;
+ const learnDates=Object.keys(plan);const finished=learnDates.filter(d=>getChecks(d).every(Boolean)).length;
+ $("doneCount").textContent=finished;$("totalCount").textContent=learnDates.length;$("rate").textContent=Math.round(finished/learnDates.length*100)+"%";
+ $("firstPct").textContent=Math.round(finished/learnDates.length*100)+"%";$("firstBar").style.width=(finished/learnDates.length*100)+"%";
+ const qdates=Object.keys(quiz);const qdone=qdates.filter(d=>getChecks(d).every(Boolean)).length;
+ $("quizPct").textContent=qdone+"/7";$("quizBar").style.width=(qdone/7*100)+"%";
+ renderWeek();
+}
+function renderWeek(){
+ const d=new Date(selected+"T12:00:00");const dow=(d.getDay()+6)%7;const monday=add(selected,-dow);
+ $("week").innerHTML=Array.from({length:7},(_,i)=>{const x=add(monday,i),n=getInfo(x),done=getChecks(x).length===6&&getChecks(x).every(Boolean);return `<button class="day ${x===selected?"active":""} ${done?"done":""}" data-date="${x}">${Number(x.slice(-2))}<small>${["一","二","三","四","五","六","日"][i]}</small></button>`}).join("");
+ $("week").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{selected=b.dataset.date;$("date").value=selected;render()}));
+}
+$("date").addEventListener("change",e=>{if(e.target.value){selected=e.target.value;render()}});
+$("prev").onclick=()=>{selected=add(selected,-1);if(selected<"2026-11-13")selected="2026-11-13";render()};
+$("next").onclick=()=>{selected=add(selected,1);if(selected>"2026-12-31")selected="2026-12-31";render()};
+$("export").onclick=()=>{const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="病生理打卡备份.json";a.click();URL.revokeObjectURL(a.href);$("status").textContent="已导出备份文件。请妥善保存。"};
+$("importBtn").onclick=()=>$("file").click();
+$("file").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(!obj||typeof obj!=="object"||Array.isArray(obj))throw Error();data=obj;save();render();$("status").textContent="备份导入成功。"}catch(err){$("status").textContent="导入失败：请选择本应用导出的JSON备份。"}e.target.value=""};
+$("reset").onclick=()=>{if(confirm("确定清空本机保存的全部打卡记录吗？此操作不可撤销。")){data={};save();render();$("status").textContent="已清空记录。"}};
+render();
+</script>
+</body></html>
